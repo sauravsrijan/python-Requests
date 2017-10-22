@@ -1,32 +1,43 @@
 import requests
 
-end_p = ['', 'ip', 'uuid', 'user-agent', 'headers', 'get', 'anything', 'anything/:anything', 
-		 'encoding/utf8', 'gzip', 'deflate', 'brotli', '/stream/5', 'delay/2',
-		 'status/200','html', 'robots.txt', 'deny', 'cache','redirect/6',
-		 'cookies', 'etag/:etag', 'cache/3', 'bytes/3', 'stream-bytes/8', 'links/2',
-		 'cookies/set?name=value','image/png', 'image/jpeg', 'image/webp', 'image/svg',
-		 'cookies/delete?name','xml']
-for second in end_p:
-	res = requests.get('https://httpbin.org/'+second)
-	assert res.status_code==200, "Status code not equal to 200 for endpoint %s" %(second)
-	print ("success for the endpoint '%s'. Going for next one now. \n" %(second))
+# list of endpoints to check.
+get_end_p = [
+    '', 'ip', 'uuid', 'user-agent', 'headers', 'get', 'anything',
+    'anything/:anything', 'encoding/utf8', 'gzip', 'deflate', 'brotli',
+    '/stream/5', 'delay/2', 'status/200', 'html', 'robots.txt', 'deny',
+    'cache', 'redirect/6', 'cookies', 'etag/:etag', 'cache/3', 'bytes/3',
+    'stream-bytes/8', 'links/2', 'cookies/set?name=value', 'image/png',
+    'image/jpeg', 'image/webp', 'image/svg', 'cookies/delete?name', 'xml']
 
-res = requests.post('https://httpbin.org/post')
-assert res.status_code == 200, "Failed"
-print ("successfully posted a request.")
+other_endP = ['post', 'patch', 'put', 'delete']
+url = 'https://httpbin.org/'
 
-res = requests.patch('https://httpbin.org/patch')
-assert res.status_code == 200, "Failed"
-print ("Patch Successfull.")
 
-res = requests.put('https://httpbin.org/put')
-assert res.status_code == 200, "Failed"
-print ("successfull for endpoint 'put'.")
+def req_gen(opt, end):
+    """Function to Check status code of request made."""
+    if opt is "get":
+        res = requests.get(url+end)
+    elif opt is "post":
+        res = requests.post(url+end)
+    elif opt is "patch":
+        res = requests.patch(url+end)
+    elif opt is "put":
+        res = requests.put(url+end)
+    elif opt is "delete":
+        res = requests.delete(url+end)
+    assert res.status_code == 200, "Failed for {}".format(url+end)
+    print("success for {}".format(url+end))
 
-res = requests.delete('https://httpbin.org/delete')
-assert res.status_code == 200, "Failed"
-print ("Delete request successfull.")
 
-failed_endP=['redirect-to?url=foo','redirect-to?url=foo&status_code=307', 'basic-auth/user/passwd',
-		'digest-auth/:qop/:user/:passwd/:algorithm', 'digest-auth/:qop/:user/:passwd','range/1024?duration=s&chunk_size=code',
-		'range/1024?duration=s&chunk_size=code', 'drip?numbytes=n&duration=s&delay=s&code=code', 'image', ]
+# checking api endpoints.
+for second in get_end_p:
+    req_gen('get', second)
+for eP in other_endP:
+    req_gen(eP, eP)
+
+failed_endP = [
+    'redirect-to?url=foo', 'redirect-to?url=foo&status_code=307',
+    'basic-auth/user/passwd', 'digest-auth/:qop/:user/:passwd/:algorithm',
+    'digest-auth/:qop/:user/:passwd', 'range/1024?duration=s&chunk_size=code',
+    'range/1024?duration=s&chunk_size=code',
+    'drip?numbytes=n&duration=s&delay=s&code=code', 'image']
